@@ -1,5 +1,18 @@
 # Metode Cloudflare Named Tunnel di VM Egress-Proxy
 
+## Prasyarat Cloudflare
+
+Sebelum mulai, siapkan:
+
+1. **Akun Cloudflare** — daftar/login di [dash.cloudflare.com](https://dash.cloudflare.com)
+2. **Domain aktif** — beli domain (atau pakai yang sudah ada), tambahkan ke Cloudflare sebagai site, dan pastikan status **Active** (nameserver sudah diarahkan ke Cloudflare)
+3. **Buat Tunnel** — di dashboard: Zero Trust → Networks → Tunnels → Create tunnel → pilih **Cloudflared** → kasih nama → copy **token instalasi** (format panjang, diawali huruf acak). Token ini yang dipakai di `~/.cloudflared/token`
+4. **(Opsional) API Token** — kalau mau kelola DNS/route via API: My Profile → API Tokens → Create Custom Token dengan izin:
+   - Zone → DNS → Edit (pilih zone domain kamu)
+   - Account → Cloudflare Tunnel → Edit
+
+Tanpa domain yang sudah Active di Cloudflare, tunnel tidak bisa diakses publik.
+
 ## Masalah
 
 VM ini **wajib** lewat egress HTTP CONNECT proxy untuk semua traffic internet.
