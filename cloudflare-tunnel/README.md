@@ -58,6 +58,32 @@ Cloudflare edge :7844
 Pernah dicoba: TLS EOF. Cloudflare validasi SNI — IP tanpa hostname yang
 benar ditolak. Jadi hostname wajib asli, yang dibelokkan hanya resolusinya.
 
+### Kenapa bisa work tanpa IP publik?
+
+Kuncinya: koneksi **dimulai dari dalam** (outbound), bukan dari luar.
+
+```
+VM ──(konek keluar)──► Cloudflare
+         ▲
+         └── jalur ini dipakai balik buat kirim request masuk
+```
+
+1. `cloudflared` di VM nelpon **keluar** ke Cloudflare (kayak buka website — proxy ngijinin).
+2. Jalur itu tetap kebuka (persistent connection).
+3. Waktu browser buka `app.example.com`, request masuk ke Cloudflare dulu.
+4. Cloudflare teruskan lewat jalur yang udah kebuka tadi ke VM.
+5. VM jawab, balik lewat jalur sama.
+
+Nggak perlu IP publik / buka port — karena yang buka koneksi itu VM-nya
+sendiri dari dalam. Firewall/proxy umumnya blokir inbound tapi ijinkan outbound,
+dan tunnel manfaatkan itu.
+
+Yang dibutuhkan agar ini work:
+1. Akun Cloudflare + domain aktif + token tunnel (lihat Prasyarat)
+2. Binary `cloudflared` + `socat` di VM
+3. Akses root (untuk `unshare --mount`)
+4. Info proxy VM (host, port, user, pass)
+
 ## File
 
 - `run-cloudflared.sh.template` — wrapper (isi `<PROXY_URL>` dan token)
