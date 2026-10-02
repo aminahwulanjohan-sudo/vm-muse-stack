@@ -1,7 +1,7 @@
 # Copy ke /etc/systemd/system/ttyd-auth.service
 # Password gate (hanya password, tanpa username) di :7682, proxy ke ttyd :7681.
 # Lihat auth-gate.js (Node stdlib, login form -> cookie session -> proxy HTTP+WS).
-# Tunnel route untuk term.<domain> harus ke http://127.0.0.1:7682 (bukan 7681).
+# Tunnel route untuk term.domainkamu.my.id harus ke http://127.0.0.1:7682 (bukan 7681).
 [Unit]
 Description=ttyd password gate
 After=ttyd.service

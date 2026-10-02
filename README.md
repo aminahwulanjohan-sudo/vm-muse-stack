@@ -11,12 +11,12 @@ Internet
    ▼
 Cloudflare Edge ◄── tunnel (HTTP/2 :7844 via proxy) ──┐
    │                                                   │
-   ├── panel.<domain> ──► 127.0.0.1:20309  server-control (panel)
-   ├── 9router.<domain> ─► 127.0.0.1:20128  9Router (LLM gateway)
-   ├── term.<domain> ────► 127.0.0.1:7682   ttyd-auth (password gate)
+   ├── panel.domainkamu.my.id ──► 127.0.0.1:20309  server-control (panel)
+   ├── 9router.domainkamu.my.id ─► 127.0.0.1:20128  9Router (LLM gateway)
+   ├── term.domainkamu.my.id ────► 127.0.0.1:7682   ttyd-auth (password gate)
    │                                     └─► 127.0.0.1:7681  ttyd
-   ├── ssh.<domain> ─────► 127.0.0.1:22     SSH (via cloudflared ProxyCommand)
-   └── cliproxy.<domain> ─► 127.0.0.1:8317  CLIProxyAPI
+   ├── ssh.domainkamu.my.id ─────► 127.0.0.1:22     SSH (via cloudflared ProxyCommand)
+   └── cliproxy.domainkamu.my.id ─► 127.0.0.1:8317  CLIProxyAPI
                                                       │
 Telegram ──► hermes-gateway ──► 9Router ──► muse-bridge (:20129)
    │                              │              │

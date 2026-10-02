@@ -70,7 +70,7 @@ VM ──(konek keluar)──► Cloudflare
 
 1. `cloudflared` di VM nelpon **keluar** ke Cloudflare (kayak buka website — proxy ngijinin).
 2. Jalur itu tetap kebuka (persistent connection).
-3. Waktu browser buka `app.example.com`, request masuk ke Cloudflare dulu.
+3. Waktu browser buka `app.domainkamu.my.id`, request masuk ke Cloudflare dulu.
 4. Cloudflare teruskan lewat jalur yang udah kebuka tadi ke VM.
 5. VM jawab, balik lewat jalur sama.
 
