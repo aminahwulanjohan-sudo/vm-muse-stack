@@ -1,0 +1,13 @@
+# Copy ke /etc/systemd/system/cloudflared.service lalu sesuaikan <USER>.
+# systemctl daemon-reload && systemctl enable --now cloudflared
+[Unit]
+Description=Cloudflare Tunnel
+After=network.target
+[Service]
+Type=simple
+User=root
+ExecStart=/home/<USER>/.cloudflared/run-cloudflared.sh
+Restart=always
+RestartSec=10
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,31 @@
+#!/bin/bash
+# Template wrapper cloudflared untuk VM egress-proxy.
+# Isi placeholder, simpan sebagai ~/.cloudflared/run-cloudflared.sh, chmod +x.
+set -e
+
+CF_DIR="$HOME/.cloudflared"
+TOKEN=$(cat "$CF_DIR/token")   # chmod 600
+
+PROXY_URL="<PROXY_URL>"        # mis. http://user:pass@proxy-host:3128
+PROXY_AUTH=$(echo "$PROXY_URL" | sed -E 's|http://([^@]+)@.*|\1|')
+PROXY_HOSTPORT=$(echo "$PROXY_URL" | sed -E 's|http://[^@]+@([^/]+)|\1|')
+PROXY_HOST=$(echo "$PROXY_HOSTPORT" | cut -d: -f1)
+PROXY_PORT=$(echo "$PROXY_HOSTPORT" | cut -d: -f2)
+
+EDGE_IP="<EDGE_IP>"            # IP salah satu edge Cloudflare, mis. 198.41.192.67
+CA_BUNDLE="<CA_BUNDLE_PATH>"   # mis. /run/hatch/egress-tls/ca-bundle.pem (kosongkan jika tidak ada intercept)
+
+# Relay lokal: terima koneksi cloudflared, teruskan via HTTP CONNECT ke proxy
+socat TCP-LISTEN:7844,bind=127.0.0.1,fork,reuseaddr \
+  PROXY:$PROXY_HOST:$EDGE_IP:7844,proxyport=$PROXY_PORT,proxyauth=$PROXY_AUTH &
+RELAY_PID=$!
+trap "kill $RELAY_PID 2>/dev/null" EXIT
+sleep 2
+
+exec unshare --mount bash -c "
+mount --bind $CF_DIR/hosts.cf /etc/hosts
+[ -n \"$CA_BUNDLE\" ] && [ -f \"$CA_BUNDLE\" ] && export SSL_CERT_FILE=$CA_BUNDLE NODE_EXTRA_CA_CERTS=$CA_BUNDLE
+export -n http_proxy https_proxy HTTP_PROXY HTTPS_PROXY
+# --edge pakai hostname agar SNI benar; hosts override arahkan ke 127.0.0.1 (relay)
+exec /usr/local/bin/cloudflared tunnel --protocol http2 --no-autoupdate --edge region1.v2.argotunnel.com:7844 run --token $TOKEN
+"

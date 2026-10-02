@@ -1,0 +1,9 @@
+# Secret — JANGAN commit file aslinya
+*.token
+*.password
+*.key
+*.pem
+.env
+config.yaml
+credentials*
+*secret*

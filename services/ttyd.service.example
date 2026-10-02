@@ -1,0 +1,13 @@
+# Copy ke /etc/systemd/system/ttyd.service
+# ttyd HANYA listen 127.0.0.1 — akses publik lewat ttyd-auth (password gate).
+[Unit]
+Description=ttyd - Terminal over Web
+After=network.target
+[Service]
+Type=simple
+User=root
+ExecStart=/home/<USER>/ttyd/ttyd -p 7681 -i 127.0.0.1 --writable bash
+Restart=always
+RestartSec=5
+[Install]
+WantedBy=multi-user.target

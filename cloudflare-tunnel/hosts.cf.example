@@ -1,0 +1,4 @@
+# hosts override untuk cloudflared (di-bind ke /etc/hosts via unshare --mount).
+# Copy sebagai ~/.cloudflared/hosts.cf
+127.0.0.1 region1.v2.argotunnel.com
+127.0.0.1 region2.v2.argotunnel.com
