@@ -68,6 +68,12 @@ tapi tidak ada yang mendengarkan di ujungnya.
 openssh-server`, install bila belum ada, baru config + enable + start.
 Idempotent, aman dijalanin tiap replace.
 
+**Monitoring:** hook `vm-health-check` (poll tiap 60 detik) ikut memantau
+port 22 — kalau sshd mati/hilang padahal service lain sehat, hook tetap
+wake agent untuk menjalankan `recover.sh`. Setelah VM replace total,
+`hermes-gateway` pasti down (unit di `/etc` ikut hilang) sehingga hook
+pasti fire.
+
 ## Pelajaran umum
 
 Setiap section `recover.sh` yang butuh paket apt WAJIB memastikan paketnya
