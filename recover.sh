@@ -227,3 +227,29 @@ systemctl restart ssh 2>/dev/null || systemctl restart sshd 2>/dev/null || true
 
 [ "$NEED_RELOAD" = 1 ] && systemctl daemon-reload
 log "recover selesai"
+
+# ---- SSH server ensure (2026-10-03) ----
+# INSIDEN 2026-10-03: ssh.<domain> via tunnel melempar 502 + "connection refused"
+# di 127.0.0.1:22 setelah VM di-replace. Akar: openssh-server BUKAN bawaan image;
+# section SSH lama hanya edit config & restart service TANPA install paket dulu,
+# jadi gagal diam-diam (file & service tidak ada).
+# Pelajaran: section yang butuh paket apt WAJIB pastikan paket terinstall
+# (dpkg -s), jangan asumsi bawaan image. Block self-contained & idempotent.
+if ! dpkg -s openssh-server >/dev/null 2>&1; then
+  log "openssh-server belum ada, install..."
+  DEBIAN_FRONTEND=noninteractive apt-get update -qq >>"$LOG" 2>&1 || true
+  DEBIAN_FRONTEND=noninteractive apt-get install -y -qq openssh-server >>"$LOG" 2>&1 || log "WARN: apt-get install openssh-server gagal"
+fi
+if [ -f /etc/ssh/sshd_config ]; then
+  grep -q "^PermitRootLogin yes" /etc/ssh/sshd_config || { sed -i 's/^#*PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config; grep -q "^PermitRootLogin" /etc/ssh/sshd_config || echo "PermitRootLogin yes" >> /etc/ssh/sshd_config; }
+  grep -q "^PasswordAuthentication yes" /etc/ssh/sshd_config || { sed -i 's/^#*PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config; grep -q "^PasswordAuthentication" /etc/ssh/sshd_config || echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config; }
+  if [ -f "$HOME_DIR/.root_password" ]; then
+    echo "root:$(cat $HOME_DIR/.root_password)" | chpasswd 2>/dev/null || true
+    chmod 600 "$HOME_DIR/.root_password" 2>/dev/null || true
+  fi
+  systemctl enable ssh 2>/dev/null || systemctl enable sshd 2>/dev/null || true
+  systemctl restart ssh 2>/dev/null || systemctl restart sshd 2>/dev/null || true
+  log "ssh server ensure selesai: $(systemctl is-active ssh 2>/dev/null || systemctl is-active sshd 2>/dev/null)"
+else
+  log "WARN: /etc/ssh/sshd_config tetap tidak ada setelah install"
+fi

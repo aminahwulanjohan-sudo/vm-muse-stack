@@ -80,4 +80,9 @@ cloudflared, mini-dns, connect-bridge, hermes-gateway, muse-bridge,
 ## Catatan
 - Resource terbatas. Jangan mining/render berat.
 - `apt install` hilang pas replace — catat di recover.sh kalau penting.
+  Pelajaran insiden SSH 2026-10-03: section yang butuh paket apt WAJIB
+  `dpkg -s <paket>` + install dulu bila belum ada — jangan asumsi bawaan
+  image. `|| true` / `2>/dev/null` boleh dipakai agar satu section tidak
+  menggagalkan semuanya, tapi section tetap harus mencapai tujuannya
+  (service jalan), bukan cuma "tidak error".
 - Database: pakai SQLite (file di home). Hindari MySQL/Postgres.

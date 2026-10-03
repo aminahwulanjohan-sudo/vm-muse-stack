@@ -80,3 +80,5 @@ bikin ulang service + start. Aman dijalanin berkali-kali. Dipanggil oleh
 health hook tiap 1 menit (silent kalau sehat).
 
 Aturan deploy agar survive replace: [docs/DEPLOY-RULES.md](docs/DEPLOY-RULES.md).
+Dok lain: [SSH via tunnel + insiden 2026-10-03](docs/SSH-TUNNEL.md) ·
+[9Router](docs/9ROUTER.md) · [Hermes](docs/HERMES.md).
