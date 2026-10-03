@@ -30,8 +30,24 @@ laptop (ssh vm-ourme)
   ssh-keygen -R vm-ourme
   ```
 
-## Insiden 2026-10-03: 502 / connection refused
+## Login tanpa password (public key)
 
+1. Di laptop: `cat ~/.ssh/id_ed25519.pub` (atau buat baru: `ssh-keygen -t ed25519`)
+2. Simpan public key secara PERSISTEN di VM:
+   `~/.ssh/authorized_keys_laptop` (satu key per baris)
+3. Pasang ke root sekarang:
+   ```
+   mkdir -p /root/.ssh && chmod 700 /root/.ssh
+   cat ~/.ssh/authorized_keys_laptop >> /root/.ssh/authorized_keys
+   chmod 600 /root/.ssh/authorized_keys
+   ```
+4. `recover.sh` punya block `SSH authorized_keys root` (append-only) yang
+   memulihkan `/root/.ssh/authorized_keys` dari salinan persisten itu
+   tiap VM di-replace — karena `/root/.ssh` ikut hilang.
+
+Pastikan `PubkeyAuthentication yes` di `sshd_config` (default Ubuntu: yes).
+
+## Insiden 2026-10-03: 502 / connection refused
 **Gejala di laptop** saat `ssh vm-ourme`:
 ```
 websocket: bad handshake

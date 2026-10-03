@@ -253,3 +253,21 @@ if [ -f /etc/ssh/sshd_config ]; then
 else
   log "WARN: /etc/ssh/sshd_config tetap tidak ada setelah install"
 fi
+
+# ---- SSH authorized_keys root (2026-10-03) ----
+# Public key laptop agar bisa SSH tanpa password. /root/.ssh HILANG tiap
+# VM replace -> pulihkan dari salinan persisten di $HOME_DIR/.ssh/authorized_keys_laptop
+# (satu key per baris; taruh public key asli di file itu, JANGAN commit key asli
+#  kalau repo publik — cukup placeholder di sini).
+# (append-only, idempotent)
+if [ -f "$HOME_DIR/.ssh/authorized_keys_laptop" ]; then
+  mkdir -p /root/.ssh
+  chmod 700 /root/.ssh
+  touch /root/.ssh/authorized_keys
+  chmod 600 /root/.ssh/authorized_keys
+  while IFS= read -r k || [ -n "$k" ]; do
+    [ -z "$k" ] && continue
+    grep -qxF "$k" /root/.ssh/authorized_keys 2>/dev/null || echo "$k" >> /root/.ssh/authorized_keys
+  done < "$HOME_DIR/.ssh/authorized_keys_laptop"
+  log "authorized_keys root dipulihkan ($(wc -l < /root/.ssh/authorized_keys) keys)"
+fi
